@@ -1,0 +1,110 @@
+Three Important things we need to install before starting  crunchydata postgre sql..
+Minikube
+kubectl
+VirtualBox
+****Install Minikube via direct download****
+1.package, you can download 
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+  && chmod +x minikube
+2.add the Minikube executable to your path:
+sudo mkdir -p /usr/local/bin/
+sudo install minikube /usr/local/bin/
+
+******Install kubectl on Linux**
+1.Download the latest release
+curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+2.Make the kubectl binary executable.
+chmod +x ./kubectl
+3.Move the binary in to your PATH.
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+*** Install VirtualBox ****
+1.Enter the following command to install VirtualBox:
+ sudo apt install virtualbox
+2. Launch VirtualBox directly through the Terminal 
+   virtualbox
+
+***Crunchy PostgreSQL for Kubernetes***
+official website link...
+1.https://www.crunchydata.com/products/crunchy-postgresql-for-kubernetes/
+
+downloading link.....
+2.https://www.crunchydata.com/developers/download-postgres/containers/postgres-operator
+
+3. kubectl create namespace pgo
+
+Download postgres-operator.yml...
+
+4. kubectl get namespace
+
+5. curl https://raw.githubusercontent.com/CrunchyData/postgres-operator/v4.4.1/installers/kubectl/postgres-operator.yml > postgres-operator.yml
+ 
+6. kubectl apply -f postgres-operator.yml
+
+Download the pgo client set up script
+
+7. curl https://raw.githubusercontent.com/CrunchyData/postgres-operator/v4.4.1/installers/kubectl/client-setup.sh > client-setup.sh
+
+Make the executable...
+8. chmod +x client-setup.sh
+
+export PGOUSER="${HOME?}/.pgo/pgo/pgouser"
+export PGO_CA_CERT="${HOME?}/.pgo/pgo/client.crt"
+export PGO_CLIENT_CERT="${HOME?}/.pgo/pgo/client.crt"
+export PGO_CLIENT_KEY="${HOME?}/.pgo/pgo/client.key"
+export PGO_APISERVER_URL='https://127.0.0.1:8443'
+export PGO_NAMESPACE=pgo
+
+When the PostgreSQL Operator is done installing, run the client setup script.
+9.  ./client-setup.sh
+
+You need new terminal for runing  port-forwarding ..
+dont need to close this terminal after runinng ...
+
+10. kubectl -n pgo port-forward svc/postgres-operator 8443:8443
+
+11.Final we need to chech 
+  pgo version
+If successful, you should see output similar to this:
+pgo client version 4.4.1
+pgo-apiserver version 4.4.1
+
+
+
+Try creating a PostgreSQL cluster called Demo
+1.Using pgo client from desktop create a postgres database cluster and delete the cluster
+
+Try creating a PostgreSQL cluster called Demo
+
+pgo create cluster -n pgo Demo
+
+pgo test -n pgo demo
+
+2.delete the cluster
+
+pgo delete cluster -n pgo 
+
+3.using pgo client create another cluster and create 3 users using pgo client only
+pgo create cluster -n pgo demo1
+pgo create cluster -n pgo demo2
+pgo create cluster -n pgo demo3
+
+pgo create user --username=user1 --selector=name=rhyme
+pgo create user --username=manageduser --selector=name=rhyme
+pgo create user --username=adm --managed --selector=name=rhyme
+pgo show user --all
+
+4.using pgo client create another cluster with each cluster 8gb ram and 2 cpu
+
+pgo create cluster hapen --cpu=4 --memory=8Gi
+pgo scale hapen --replica-count=2
+pgo create cluster demo --cpu=4 --memory=8Gi --replica-count=2
+pgo create cluster nio --service-type=LoadBalancer
+
+*******************thank you*********************************
+
+
+
+
+
+
